@@ -39,13 +39,17 @@ class Ip_Import_CustomController extends Mage_Adminhtml_Controller_Action
         $insert = Mage::getSingleton('core/resource')->getConnection('core_write');
         $file = fopen($_FILES['file']['tmp_name'], "r");
         $columns = array();
+        $index = array();
         while ($data = fgetcsv($file, 2000, ",")) {
             if(!$columns){
                 $columns = $data;
+                $index['sku'] = array_search('sku', $columns);
+                $index['customer_group'] = array_search('customer_group', $columns);
+                $index['group_price'] = array_search('group_price');
             } else {
-                $sku = $data[0];
-                $customer_group_id = $data[1];
-                $value = $data[2];
+                $sku = $data[$index['sku']];
+                $customer_group_id = $data[$index['customer_group']];
+                $value = $data[$index['group_price']];
                 $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
                 if($product && $product->getId()){
                     $entity_id = $product->getId();
